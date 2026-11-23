@@ -28,7 +28,7 @@ int remplirDataset(data *data, char *chemin, int interval_a, int interval_b);
 //charge les données des csv pour les mettes dans data
 
 int loadDataset(data *data, char *chemin, int interval_a, int interval_b);
-//appelle les fonctions nbLignes, nbDim et remplir dataset pour créer un dataset complet.
+//appelle les fonctions nbLignes, nbDim et remplir dataset pour créer un dataset complet. interval_b = -1 pour prendre tout le dataset
 
 void swap(data *data, int indice_a, int indice_b);
 //échange l'adresse entre deux exemples.
