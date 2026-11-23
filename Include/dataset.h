@@ -24,5 +24,11 @@ int nbDim();
 int main();
 //fonction principale du dataset
 
-int remplirDataset(data* data, char* chemin);
+int remplirDataset(data *data, char *chemin, int interval_a, int interval_b);
 //charge les données des csv pour les mettes dans data
+
+int loadDataset(data *data, char *chemin, int interval_a, int interval_b);
+//appelle les fonctions nbLignes, nbDim et remplir dataset pour créer un dataset complet.
+
+void swap(data *data, int indice_a, int indice_b);
+//échange l'adresse entre deux exemples.

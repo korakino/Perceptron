@@ -4,19 +4,41 @@
 data creationdataset(data exempleAddr)
 {
     int ligne = exempleAddr.n;
-    int colonnes = exempleAddr.dim + 1;
+    int colonnes = exempleAddr.dim;
 
     exempleAddr.exemple = malloc(ligne * sizeof(float *));
+
+    if (exempleAddr.exemple == NULL)
+    {
+        perror("Erreur d'allocation du tableau principal");
+        exempleAddr.n = 0;
+        return exempleAddr;
+    }
 
     for (int i = 0; i < ligne; i++)
     {
         exempleAddr.exemple[i] = malloc(colonnes * sizeof(*exempleAddr.exemple[i]));
+        if (exempleAddr.exemple[i] == NULL)
+        {
+            perror("Erreur d'allocation d'une ligne");
+            for (int j = 0; j < i; j++)
+            {
+                free(exempleAddr.exemple[j]);
+            }
+            free(exempleAddr.exemple);
+            exempleAddr.exemple = NULL;
+            exempleAddr.n = 0;
+            return exempleAddr;
+        }
     }
     return exempleAddr;
 }
 
 void freedataset(data exempleAddr)
 {
+    if (exempleAddr.exemple == NULL)
+        return;
+
     for (int i = 0; i < exempleAddr.n; i++)
     {
         free(exempleAddr.exemple[i]);
@@ -78,13 +100,14 @@ int nbDim(char *chemin)
     return dim;
 }
 
-int remplirDataset(data *data, char *chemin)
+int remplirDataset(data *data, char *chemin, int interval_a, int interval_b)
 {
 
     int ligne = 0;
     int colonne = 0;
     FILE *fo = fopen(chemin, "r");
     char caracteres[256];
+    int interval = 0;
 
     if (fo == NULL)
     {
@@ -94,34 +117,46 @@ int remplirDataset(data *data, char *chemin)
 
     else
     {
-        while (fgets(caracteres, sizeof(caracteres), fo) != NULL)
+        while (fgets(caracteres, sizeof(caracteres), fo) != NULL && interval != interval_b)
         { // debut du remplissage.
+          // On ignore les lignes vides avant le saut (interval < interval_a) ET avant la lecture
             if (!(caracteres[0] == '\n' || caracteres[0] == '\r'))
             {
-                const char *delim = ",\r\n";
-
-                char *token = strtok(caracteres, delim);
-                colonne = 0;
-                while (token != NULL)
+                if (interval < interval_a)
                 {
-                    if (colonne >= data->dim + 1)
+                    interval++;
+                }
+                else
+                {
+                    if (!(caracteres[0] == '\n' || caracteres[0] == '\r'))
                     {
-                        printf("trop de valeurs dans la ligne\n");
-                        fclose(fo);
-                        return -1;
-                    }
-                    data->exemple[ligne][colonne] = (float)atof(token);
-                    token = strtok(NULL, delim);
-                    colonne++;
-                }
+                        const char *delim = ",\r\n";
 
-                if (colonne < data->dim + 1)
-                {
-                    printf("pas assez de valeurs dans la ligne\n");
-                    fclose(fo);
-                    return -1;
+                        char *token = strtok(caracteres, delim);
+                        colonne = 0;
+                        while (token != NULL)
+                        {
+                            if (colonne >= data->dim)
+                            {
+                                printf("trop de valeurs dans la ligne\n");
+                                fclose(fo);
+                                return -1;
+                            }
+                            data->exemple[ligne][colonne] = (float)atof(token);
+                            token = strtok(NULL, delim);
+                            colonne++;
+                        }
+
+                        if (colonne < data->dim)
+                        {
+                            printf("pas assez de valeurs dans la ligne\n");
+                            fclose(fo);
+                            return -1;
+                        }
+                        ligne++;
+                        interval++;
+                    }
                 }
-                ligne++;
             }
         }
     }
@@ -132,7 +167,7 @@ int remplirDataset(data *data, char *chemin)
 void afficheData(data data)
 {
     int ligne = data.n;
-    int colonne = data.dim;
+    int colonne = data.dim - 1;
     for (int i = 0; i < ligne; i++)
     {
         printf("[");
@@ -144,25 +179,67 @@ void afficheData(data data)
     }
 }
 
+int loadDataset(data *data, char *chemin, int interval_a, int interval_b)
+{
+    int tmp = nbLignes(chemin);
+    data->dim = nbDim(chemin);
+
+    if (interval_b == -1)
+    {
+        interval_b = tmp;
+    }
+
+    data->n = interval_b - interval_a;
+
+    if (data->n <= 0 || data->dim <= 0)
+        return -1;
+    if (interval_a < 0 || interval_b > tmp)
+        return -1;
+
+    *data = creationdataset(*data);
+    if (data->exemple == NULL)
+    {
+        return -1;
+    }
+
+    if (remplirDataset(data, chemin, interval_a, interval_b) == -1)
+    {
+        freedataset(*data);
+        return -1;
+    }
+    return 0;
+}
+
+void swap(data *data, int indice_a, int indice_b)
+{
+    float *tmp;
+    tmp = data->exemple[indice_a];
+    data->exemple[indice_a] = data->exemple[indice_b];
+    data->exemple[indice_b] = tmp;
+}
+
+void melange(data *data)
+{
+    if (data->exemple == NULL)
+    {
+        printf("data est vide !\n");
+        return;
+    }
+
+    int num = 0;
+    for (int i = data->n - 1; i > 0; i--)
+    {
+        num = rand() % (i + 1);
+        swap(data, i, num);
+    }
+}
+
 int main(void)
 {
     data data;
-    char *chemin = "data/ou.csv";
-    data.n = nbLignes(chemin);
-    data.dim = nbDim(chemin) - 1;
-
-    if (data.n <= 0 || data.dim <= 0)
-        return 1;
-
-    data = creationdataset(data);
-
-    if (remplirDataset(&data, chemin) == -1)
-    {
-        freedataset(data);
-        return -1;
-    }
-    else
-        afficheData(data);
+    char *chemin = "data/champignons.csv";
+    loadDataset(&data, chemin, 0, -1);
+    afficheData(data);
 
     freedataset(data);
 
