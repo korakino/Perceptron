@@ -1,0 +1,52 @@
+# ==========================================
+# Fichiers compilés et exécutables (C)
+# ==========================================
+*.o
+*.obj
+*.out
+*.exe
+*.app
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+
+# Fichiers de débogage
+*.dSYM/
+*.su
+*.idb
+*.pdb
+*.ilk
+
+# Dossiers de build courants (Makefile, CMake, etc.)
+build/
+bin/
+obj/
+out/
+Debug/
+Release/
+
+# ==========================================
+# Visual Studio Code
+# ==========================================
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# ==========================================
+# Système d'exploitation (OS)
+# ==========================================
+# macOS
+.DS_Store
+._*
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Linux
+*~
