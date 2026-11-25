@@ -1,7 +1,7 @@
 #include "../Include/dataset.h"
-#include <stdio.h>
 
-data creationdataset(data exempleAddr)
+
+data creation_dataset(data exempleAddr)
 {
     int ligne = exempleAddr.n;
     int colonnes = exempleAddr.dim;
@@ -196,7 +196,7 @@ int loadDataset(data *data, char *chemin, int interval_a, int interval_b)
     if (interval_a < 0 || interval_b > tmp)
         return -1;
 
-    *data = creationdataset(*data);
+    *data = creation_dataset(*data);
     if (data->exemple == NULL)
     {
         return -1;

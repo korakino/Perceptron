@@ -1,7 +1,13 @@
+#ifndef DATASET_H
+#define DATASET_H
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <time.h>
 
 
 typedef struct data
@@ -12,8 +18,11 @@ typedef struct data
     float **exemple; // caratéristiques du chapignons
 } data;
 
-void creation();
+data creation_dataset(data exempleAddr);
 // alloue dynamiquement la mémoire
+
+void freedataset(data exempleAddr);
+//libere la mémoire dynamiquement
 
 int nbLignes();
 // fonction qui va chercher les données dans champignons.csv et compte le nombre de lignes que le fichier a
@@ -32,3 +41,9 @@ int loadDataset(data *data, char *chemin, int interval_a, int interval_b);
 
 void swap(data *data, int indice_a, int indice_b);
 //échange l'adresse entre deux exemples.
+
+void melange(data *data);
+//melange les exemples du dataset
+
+
+#endif
