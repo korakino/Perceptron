@@ -234,14 +234,30 @@ void melange(data *data)
     }
 }
 
-int main(void)
-{
-    data data;
-    char *chemin = "data/champignons.csv";
-    loadDataset(&data, chemin, 0, -1);
-    afficheData(data);
 
-    freedataset(data);
 
-    return 0;
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// int main(void)
+// {
+//     data data;
+//     char *chemin = "data/champignons.csv";
+//     loadDataset(&data, chemin, 0, -1);
+//     afficheData(data);
+
+//     freedataset(data);
+
+//     return 0;
+// }
