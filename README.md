@@ -74,8 +74,6 @@ ERROR SUMMARY: 0 errors from 0 contexts
 | `data/et.csv` | Non (`1.0`) | Non (`0`) | 100 | **100,00 %** | — | Linéairement séparable (`w=[1.78, 1.79], b=-2.94`) |
 | `data/ou.csv` | Non (`1.0`) | Non (`0`) | 100 | **100,00 %** | — | Linéairement séparable (`w=[2.52, 2.51], b=-0.59`) |
 | `data/champignons.csv` | Oui (`0.8`) | Oui (`1`) | 100 | **100,00 %** | **100,00 %** | Convergence stable (`w=[2.74, 1.85, 1.98, -10.12], b=1.11`) |
-| `data/points2d.csv` *(à compléter)* | Oui (`0.8`) | Oui (`1`) | 100 | *XX,XX %* | *XX,XX %* | *Commande : `./output/main data/points2d.csv 100 0.1 0.8 1`* |
-| `data/xor.csv` *(à compléter)* | Non (`1.0`) | Non (`0`) | 100 | *XX,XX %* | — | *Non linéairement séparable (~50–75 % attendu)* |
 
 ---
 
