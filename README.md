@@ -62,9 +62,8 @@ ERROR SUMMARY: 0 errors from 0 contexts
   $$w_i \leftarrow w_i + \eta \cdot (y - \hat{y}) \cdot x_i \qquad \text{et} \qquad b \leftarrow b + \eta \cdot (y - \hat{y})$$
 
 ### Difficultés rencontrées et solutions apportées
-1. **Division entière cachée en C :** l'expression `(float)(nb_correcte / d.n)` effectuait une division entière avant la conversion en flottant, tronquant toute accuracy inférieure à `100 %` à `0.00 %`. Corrigé en convertissant explicitement le numérateur ou le dénominateur en `float` avant la division (`(float)nb_correcte / d.n` et `float den`).
-2. **Gestion des indices et double pointeur :** correction d'un accès hors limites sur le label (`data.dim` au lieu de `data.dim - 1`) lors du remplissage de la matrice de confusion, ainsi que du passage de pointeur (`perc` au lieu de `&perc`), détectés grâce à `-Wall -Wextra` et Valgrind.
-3. **Sécurisation mémoire CSV & mode sans split :** remise à `NULL` systématique des pointeurs après libération partielle en cas d'erreur de lecture CSV afin d'écarter tout risque de *double free*, et adaptation de `splitDataset` pour accepter `ratio = 1.0` (`test.n = 0`) sans allouer de jeu de test vide.
+1. **Gestion des indices et double pointeur :** correction d'un accès hors limites sur le label (`data.dim` au lieu de `data.dim - 1`) lors du remplissage de la matrice de confusion, ainsi que du passage de pointeur (`perc` au lieu de `&perc`), détectés grâce à `-Wall -Wextra` et Valgrind.
+2. **Sécurisation mémoire CSV & mode sans split :** remise à `NULL` systématique des pointeurs après libération partielle en cas d'erreur de lecture CSV afin d'écarter tout risque de *double free*, et adaptation de `splitDataset` pour accepter `ratio = 1.0` (`test.n = 0`) sans allouer de jeu de test vide.
 
 ---
 
