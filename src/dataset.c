@@ -1,6 +1,5 @@
 #include "../Include/dataset.h"
 
-
 data creation_dataset(data exempleAddr)
 {
     int ligne = exempleAddr.n;
@@ -234,21 +233,53 @@ void melange(data *data)
     }
 }
 
+int splitDataset(data *source, float ratio, data *train, data *test)
+{
+    if (source == NULL || source->exemple == NULL || train == NULL || test == NULL)
+        return -1;
+    if (ratio <= 0.0f || ratio >= 1.0f)
+        return -1;
 
+    int n_train = (int)(source->n * ratio);
+    int n_test = source->n - n_train;
 
+    if (n_train <= 0 || n_test <= 0)
+        return -1;
 
+    train->n = n_train;
+    train->dim = source->dim;
+    *train = creation_dataset(*train);
+    if (train->exemple == NULL)
+        return -1;
 
+    test->n = n_test;
+    test->dim = source->dim;
+    *test = creation_dataset(*test);
+    if (test->exemple == NULL)
+    {
+        freedataset(*train);
+        return -1;
+    }
 
+    
 
+    for (int i = 0; i < n_train; i++)
+    {
+        for (int k = 0; k < train->dim; k++)
+        {
+            train->exemple[i][k] = source->exemple[i][k];
+        }
+    }
+    for (int j = 0; j < n_test; j++)
+    {
+        for (int k = 0; k < test->dim; k++)
+        {
+            test->exemple[j][k] = source->exemple[j + n_train][k];
+        }
+    }
 
-
-
-
-
-
-
-
-
+    return 0;
+}
 
 // int main(void)
 // {

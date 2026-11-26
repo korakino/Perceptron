@@ -45,5 +45,7 @@ void swap(data *data, int indice_a, int indice_b);
 void melange(data *data);
 //melange les exemples du dataset
 
+int splitDataset(data *source, float ratio, data *train, data *test);
+//creer les dataset train et test à partir du dataset d'origine
 
 #endif

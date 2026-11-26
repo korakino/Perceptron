@@ -1,4 +1,5 @@
 Main: ./src/main.c perceptron.o dataset.o
+
 	gcc -g ./src/main.c ./output/perceptron.o ./output/dataset.o -o ./output/main -Wall -Wextra -lm
 
 
