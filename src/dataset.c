@@ -238,15 +238,13 @@ void melange(data *data)
 
 int splitDataset(data *source, float ratio, data *train, data *test)
 {
-    if (source == NULL || source->exemple == NULL || train == NULL || test == NULL)
-        return -1;
-    if (ratio <= 0.0f || ratio >= 1.0f)
+    if (ratio <= 0.0f || ratio > 1.0f)
         return -1;
 
     int n_train = (int)(source->n * ratio);
     int n_test = source->n - n_train;
 
-    if (n_train <= 0 || n_test <= 0)
+    if (n_train <= 0 || n_test < 0)
         return -1;
 
     train->n = n_train;
@@ -257,11 +255,15 @@ int splitDataset(data *source, float ratio, data *train, data *test)
 
     test->n = n_test;
     test->dim = source->dim;
-    *test = creation_dataset(*test);
-    if (test->exemple == NULL)
+    test->exemple = NULL;
+    if (n_test > 0)
     {
-        freedataset(*train);
-        return -1;
+        *test = creation_dataset(*test);
+        if (test->exemple == NULL)
+        {
+            freedataset(*train);
+            return -1;
+        }
     }
 
     for (int i = 0; i < n_train; i++)
@@ -327,7 +329,7 @@ void calcul(norme *norme, data data)
 
 void applicationNorme(data *data, norme norme)
 {
-    if (data->exemple == NULL || data->n <= 0 || data->dim <= 1 || norme.max == NULL || norme.min == NULL || norme.caracteristiques != data->dim - 1|| data == NULL)
+    if (data->exemple == NULL || data->n <= 0 || data->dim <= 1 || norme.max == NULL || norme.min == NULL || norme.caracteristiques != data->dim - 1 || data == NULL)
         return;
 
     float etendu = 0;
@@ -354,13 +356,13 @@ void applicationNorme(data *data, norme norme)
 
 void liberation_n(norme *norme)
 {
-    if (norme == NULL) return;
+    if (norme == NULL)
+        return;
     norme->caracteristiques = 0;
     free(norme->min);
     free(norme->max);
     norme->min = NULL;
     norme->max = NULL;
-
 }
 
 // int main(void)

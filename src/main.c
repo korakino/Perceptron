@@ -83,16 +83,17 @@ int main(int argc, char *argv[])
     printf("Dataset : %d exemples (%d train, %d test), %d caracteristiques\n",
            dataset.n, train.n, test.n, dataset.dim - 1);
     printf("Accuracy avant entrainement (train) : %.2f%%\n", accuracy(perc, train) * 100.0f);
-    printf("Accuracy avant entrainement (test)  : %.2f%%\n", accuracy(perc, test) * 100.0f);
+    if (test.n > 0)
+        printf("Accuracy avant entrainement (test)  : %.2f%%\n", accuracy(perc, test) * 100.0f);
 
     entrainement(perc, &train, epochs);
 
     printf("Accuracy apres entrainement (%d epoques, lr=%.4f) :\n", epochs, lr);
     printf("  -> Train : %.2f%%\n", accuracy(perc, train) * 100.0f);
-    printf("  -> Test  : %.2f%%\n", accuracy(perc, test) * 100.0f);
-
     if (test.n > 0)
     {
+        printf("  -> Test  : %.2f%%\n", accuracy(perc, test) * 100.0f);
+
         matrice mat = {0, 0, 0, 0};
         remplirMatrice(test, &mat, perc, 1);
 
