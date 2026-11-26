@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     perceptron *perc = creation_p(dataset->dim -1, lr);
 
 
-
+    printf("test\n");
 
 
 
