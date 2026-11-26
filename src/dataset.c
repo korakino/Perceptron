@@ -1,7 +1,6 @@
 #include "../Include/dataset.h"
-#include <stdio.h>
 
-data creationdataset(data exempleAddr)
+data creation_dataset(data exempleAddr)
 {
     int ligne = exempleAddr.n;
     int colonnes = exempleAddr.dim;
@@ -58,7 +57,7 @@ int nbLignes(char *chemin)
         return -1;
     }
 
-    char ligne[256];
+    char ligne[4096];
 
     while (fgets(ligne, sizeof(ligne), fo) != NULL)
     {
@@ -74,7 +73,7 @@ int nbDim(char *chemin)
 {
     int dim = 0;
     FILE *fo = fopen(chemin, "r");
-    char ligne[256];
+    char ligne[4096];
 
     if (fo == NULL)
     {
@@ -106,7 +105,7 @@ int remplirDataset(data *data, char *chemin, int interval_a, int interval_b)
     int ligne = 0;
     int colonne = 0;
     FILE *fo = fopen(chemin, "r");
-    char caracteres[256];
+    char caracteres[4096];
     int interval = 0;
 
     if (fo == NULL)
@@ -196,7 +195,7 @@ int loadDataset(data *data, char *chemin, int interval_a, int interval_b)
     if (interval_a < 0 || interval_b > tmp)
         return -1;
 
-    *data = creationdataset(*data);
+    *data = creation_dataset(*data);
     if (data->exemple == NULL)
     {
         return -1;
@@ -205,6 +204,9 @@ int loadDataset(data *data, char *chemin, int interval_a, int interval_b)
     if (remplirDataset(data, chemin, interval_a, interval_b) == -1)
     {
         freedataset(*data);
+        data->exemple = NULL;
+        data->n = 0;
+        data->dim = 0;
         return -1;
     }
     return 0;
@@ -234,21 +236,134 @@ void melange(data *data)
     }
 }
 
+int splitDataset(data *source, float ratio, data *train, data *test)
+{
+    if (ratio <= 0.0f || ratio > 1.0f)
+        return -1;
 
+    int n_train = (int)(source->n * ratio);
+    int n_test = source->n - n_train;
 
+    if (n_train <= 0 || n_test < 0)
+        return -1;
 
+    train->n = n_train;
+    train->dim = source->dim;
+    *train = creation_dataset(*train);
+    if (train->exemple == NULL)
+        return -1;
 
+    test->n = n_test;
+    test->dim = source->dim;
+    test->exemple = NULL;
+    if (n_test > 0)
+    {
+        *test = creation_dataset(*test);
+        if (test->exemple == NULL)
+        {
+            freedataset(*train);
+            return -1;
+        }
+    }
 
+    for (int i = 0; i < n_train; i++)
+    {
+        for (int k = 0; k < train->dim; k++)
+        {
+            train->exemple[i][k] = source->exemple[i][k];
+        }
+    }
+    for (int j = 0; j < n_test; j++)
+    {
+        for (int k = 0; k < test->dim; k++)
+        {
+            test->exemple[j][k] = source->exemple[j + n_train][k];
+        }
+    }
 
+    return 0;
+}
 
+void calcul(norme *norme, data data)
+{
+    if (norme == NULL || data.exemple == NULL || data.n <= 0 || data.dim <= 1)
+        return;
+    norme->caracteristiques = data.dim - 1;
 
+    norme->max = malloc(sizeof(float) * norme->caracteristiques);
+    norme->min = malloc(sizeof(float) * norme->caracteristiques);
 
+    if (norme->max == NULL || norme->min == NULL)
+    {
+        perror("erreur d'allocation des valeurs caractéristiques");
+        free(norme->max);
+        free(norme->min);
+        norme->max = NULL;
+        norme->min = NULL;
+        norme->caracteristiques = 0;
+        return;
+    }
 
+    int colonne = 0;
 
+    while (colonne < norme->caracteristiques)
+    {
 
+        norme->max[colonne] = data.exemple[0][colonne];
+        norme->min[colonne] = data.exemple[0][colonne];
+        for (int i = 0; i < data.n; i++)
+        {
+            if (norme->max[colonne] < data.exemple[i][colonne])
+            {
+                norme->max[colonne] = data.exemple[i][colonne];
+            }
+            if (norme->min[colonne] > data.exemple[i][colonne])
+            {
+                norme->min[colonne] = data.exemple[i][colonne];
+            }
+        }
 
+        colonne++;
+    }
+}
 
+void applicationNorme(data *data, norme norme)
+{
+    if (data->exemple == NULL || data->n <= 0 || data->dim <= 1 || norme.max == NULL || norme.min == NULL || norme.caracteristiques != data->dim - 1 || data == NULL)
+        return;
 
+    float etendu = 0;
+    float valeur = 0;
+
+    for (int i = 0; i < data->n; i++)
+    {
+        for (int j = 0; j < data->dim - 1; j++)
+        {
+            etendu = norme.max[j] - norme.min[j];
+            valeur = data->exemple[i][j];
+            if (etendu == 0)
+            {
+                valeur = 0;
+            }
+            else
+            {
+                valeur = (valeur - norme.min[j]) / etendu;
+            }
+            data->exemple[i][j] = valeur;
+        }
+    }
+}
+
+void liberation_n(norme *norme)
+{
+    if (norme == NULL)
+        return;
+    norme->caracteristiques = 0;
+    free(norme->min);
+    free(norme->max);
+    norme->min = NULL;
+    norme->max = NULL;
+}
 
 // int main(void)
 // {
