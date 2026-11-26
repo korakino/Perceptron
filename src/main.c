@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     char *chemin = argv[1];
     int epochs = 100;      // valeur par défaut si non précisée
     float lr = 0.1f;       // valeur par défaut si non précisée
-    float ratio = 0.8;     // valeur par défaut si non précisée
+    float ratio = 0.8f;    // valeur par défaut si non précisée
     int normalisation = 1; // valeur par défaut si non précisée
 
     if (argc >= 3)
@@ -74,7 +74,6 @@ int main(int argc, char *argv[])
             freedataset(dataset);
             freedataset(train);
             freedataset(test);
-
             return 1;
         }
         applicationNorme(&train, norme);
@@ -92,7 +91,23 @@ int main(int argc, char *argv[])
     printf("  -> Train : %.2f%%\n", accuracy(perc, train) * 100.0f);
     printf("  -> Test  : %.2f%%\n", accuracy(perc, test) * 100.0f);
 
-    printf("Parametres appris : ");
+    if (test.n > 0)
+    {
+        matrice mat = {0, 0, 0, 0};
+        remplirMatrice(test, &mat, perc, 1);
+
+        printf("\nMatrice de confusion sur le test set (classe positive = 1) :\n");
+        printf("  TP = %d | FP = %d\n", mat.TP, mat.FP);
+        printf("  FN = %d | TN = %d\n", mat.FN, mat.TN);
+
+        printf("Metriques sur le test set :\n");
+        printf("  -> Accuracy  : %.2f%%\n", accuracyMatrice(mat) * 100.0f);
+        printf("  -> Precision : %.2f%%\n", precisionMatrice(mat) * 100.0f);
+        printf("  -> Rappel    : %.2f%%\n", recallMatrice(mat) * 100.0f);
+        printf("  -> F1-score  : %.2f%%\n", scoreMatrice(mat) * 100.0f);
+    }
+
+    printf("\nParametres appris : ");
     for (int i = 0; i < perc->dim; i++)
     {
         printf("w[%d]=%.4f ", i, perc->w[i]);

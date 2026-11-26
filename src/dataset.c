@@ -57,7 +57,7 @@ int nbLignes(char *chemin)
         return -1;
     }
 
-    char ligne[256];
+    char ligne[4096];
 
     while (fgets(ligne, sizeof(ligne), fo) != NULL)
     {
@@ -73,7 +73,7 @@ int nbDim(char *chemin)
 {
     int dim = 0;
     FILE *fo = fopen(chemin, "r");
-    char ligne[256];
+    char ligne[4096];
 
     if (fo == NULL)
     {
@@ -105,7 +105,7 @@ int remplirDataset(data *data, char *chemin, int interval_a, int interval_b)
     int ligne = 0;
     int colonne = 0;
     FILE *fo = fopen(chemin, "r");
-    char caracteres[256];
+    char caracteres[4096];
     int interval = 0;
 
     if (fo == NULL)
@@ -204,6 +204,9 @@ int loadDataset(data *data, char *chemin, int interval_a, int interval_b)
     if (remplirDataset(data, chemin, interval_a, interval_b) == -1)
     {
         freedataset(*data);
+        data->exemple = NULL;
+        data->n = 0;
+        data->dim = 0;
         return -1;
     }
     return 0;
@@ -324,7 +327,7 @@ void calcul(norme *norme, data data)
 
 void applicationNorme(data *data, norme norme)
 {
-    if (data->exemple == NULL || data->n <= 0 || data->dim <= 1 || norme.max == NULL || norme.min == NULL || norme.caracteristiques != data->dim - 1)
+    if (data->exemple == NULL || data->n <= 0 || data->dim <= 1 || norme.max == NULL || norme.min == NULL || norme.caracteristiques != data->dim - 1|| data == NULL)
         return;
 
     float etendu = 0;
@@ -351,6 +354,7 @@ void applicationNorme(data *data, norme norme)
 
 void liberation_n(norme *norme)
 {
+    if (norme == NULL) return;
     norme->caracteristiques = 0;
     free(norme->min);
     free(norme->max);

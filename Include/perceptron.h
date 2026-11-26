@@ -40,4 +40,20 @@ void entrainement(perceptron *p, data *data, int nb_epoque);
 // calcul la justesse des interpretation du perceptron et les compare
 float accuracy(perceptron *p, data d);
 
+//cherche les 4 valeurs possible d'une reponse venant du perceptron et les met dans la matrice
+void remplirMatrice(data data, matrice *matrice, const perceptron *perc, int classe_positive);
+
+//calcul l'accuracy de la matrice
+float accuracyMatrice(matrice matrice);
+
+//calcul la precision de la matrice
+float precisionMatrice(matrice matrice);
+
+//calcul le recall de la matrice
+float recallMatrice(matrice matrice);
+
+//calcul le F1-score de la matrice
+float scoreMatrice(matrice matrice);
+
+
 #endif

@@ -103,11 +103,83 @@ float accuracy(perceptron *p, data d)
     {
         float predit = prediction(p, d.exemple[i]);
         int label = (int)(d.exemple[i][d.dim - 1] + 0.5f);
-        if ( (predit >= 0.5 && 1 == label) || (predit < 0.5 && 0 == label ) )
+        if ((predit >= 0.5 && 1 == label) || (predit < 0.5 && 0 == label))
         {
             nb_correcte++;
         }
-
     }
-    return (float)(nb_correcte/d.n);
+    return (float)nb_correcte / d.n;
+}
+
+void remplirMatrice(data data, matrice *matrice, const perceptron *perc, int classe_positive)
+{
+    if (matrice == NULL || perc == NULL || data.exemple == NULL || data.n <= 0 || perc->dim != data.dim - 1 || (classe_positive != 0 && classe_positive != 1))
+    {
+        fprintf(stderr, "Erreur : parametres invalides dans remplirMatrice.\n");
+        return;
+    }
+    matrice->FN = 0;
+    matrice->TN = 0;
+    matrice->TP = 0;
+    matrice->FP = 0;
+    int label;
+    float predic;
+    for (int i = 0; i < data.n; i++)
+    {
+        label = (int)(data.exemple[i][data.dim - 1] + 0.5f);
+        predic = prediction(perc, data.exemple[i]);
+        int classe_predite = (predic >= 0.5f) ? 1 : 0;
+        if (classe_predite == label && label == classe_positive)
+            matrice->TP++;
+        else if (classe_predite != label && label != classe_positive)
+            matrice->FP++;
+        else if (classe_predite != label && label == classe_positive)
+            matrice->FN++;
+        else
+            matrice->TN++;
+    }
+}
+
+float accuracyMatrice(matrice matrice)
+{
+    float den = matrice.FN + matrice.FP + matrice.TN + matrice.TP;
+    float res = 0;
+    if (den != 0)
+    {
+        res = (matrice.TN + matrice.TP) / den;
+    }
+    return res;
+}
+float precisionMatrice(matrice matrice)
+{
+    float den = matrice.FP + matrice.TP;
+    float res = 0;
+    if (den != 0)
+    {
+        res = (matrice.TP) / den;
+    }
+    return res;
+}
+float recallMatrice(matrice matrice)
+{
+    float den = matrice.FN + matrice.TP;
+    float res = 0;
+    if (den != 0)
+    {
+        res = (matrice.TP) / den;
+    }
+    return res;
+}
+float scoreMatrice(matrice matrice)
+{
+    float precision = precisionMatrice(matrice);
+    float recall = recallMatrice(matrice);
+    float den = precision + recall;
+    float res = 0;
+    if (den != 0)
+    {
+        res = 2*(precision*recall) / den;
+    }
+    return res;
+
 }
