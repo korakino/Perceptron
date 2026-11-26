@@ -29,6 +29,8 @@ int main(int argc, char *argv[])
 
     data *dataset = loadDataset(dataset, chemin, 0, -1);
 
+    perceptron *perc = creation_p(dataset->dim -1, lr);
+
 
 
 
