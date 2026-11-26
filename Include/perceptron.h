@@ -11,6 +11,14 @@ typedef struct perceptron
     float lr; // taux d'apprentissage
 } perceptron;
 
+typedef struct matrice_confusion
+{
+    int TP;
+    int FP;
+    int TN;
+    int FN;
+} matrice;
+
 // Initialise un perceptron, ses poids a zero et son taux d'apprentissage.
 perceptron *creation_p(int dim, float lr);
 
@@ -29,8 +37,7 @@ void maj(perceptron *p, int label, const float x[]);
 // Entraine le perceptron sur toutes les donnees pendant plusieurs epoques.
 void entrainement(perceptron *p, data *data, int nb_epoque);
 
-//calcul la justesse des interpretation du perceptron et les compare
+// calcul la justesse des interpretation du perceptron et les compare
 float accuracy(perceptron *p, data d);
-
 
 #endif

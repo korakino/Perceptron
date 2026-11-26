@@ -261,8 +261,6 @@ int splitDataset(data *source, float ratio, data *train, data *test)
         return -1;
     }
 
-    
-
     for (int i = 0; i < n_train; i++)
     {
         for (int k = 0; k < train->dim; k++)
@@ -279,6 +277,86 @@ int splitDataset(data *source, float ratio, data *train, data *test)
     }
 
     return 0;
+}
+
+void calcul(norme *norme, data data)
+{
+    if (norme == NULL || data.exemple == NULL || data.n <= 0 || data.dim <= 1)
+        return;
+    norme->caracteristiques = data.dim - 1;
+
+    norme->max = malloc(sizeof(float) * norme->caracteristiques);
+    norme->min = malloc(sizeof(float) * norme->caracteristiques);
+
+    if (norme->max == NULL || norme->min == NULL)
+    {
+        perror("erreur d'allocation des valeurs caractéristiques");
+        free(norme->max);
+        free(norme->min);
+        norme->max = NULL;
+        norme->min = NULL;
+        norme->caracteristiques = 0;
+        return;
+    }
+
+    int colonne = 0;
+
+    while (colonne < norme->caracteristiques)
+    {
+
+        norme->max[colonne] = data.exemple[0][colonne];
+        norme->min[colonne] = data.exemple[0][colonne];
+        for (int i = 0; i < data.n; i++)
+        {
+            if (norme->max[colonne] < data.exemple[i][colonne])
+            {
+                norme->max[colonne] = data.exemple[i][colonne];
+            }
+            if (norme->min[colonne] > data.exemple[i][colonne])
+            {
+                norme->min[colonne] = data.exemple[i][colonne];
+            }
+        }
+
+        colonne++;
+    }
+}
+
+void applicationNorme(data *data, norme norme)
+{
+    if (data->exemple == NULL || data->n <= 0 || data->dim <= 1 || norme.max == NULL || norme.min == NULL || norme.caracteristiques != data->dim - 1)
+        return;
+
+    float etendu = 0;
+    float valeur = 0;
+
+    for (int i = 0; i < data->n; i++)
+    {
+        for (int j = 0; j < data->dim - 1; j++)
+        {
+            etendu = norme.max[j] - norme.min[j];
+            valeur = data->exemple[i][j];
+            if (etendu == 0)
+            {
+                valeur = 0;
+            }
+            else
+            {
+                valeur = (valeur - norme.min[j]) / etendu;
+            }
+            data->exemple[i][j] = valeur;
+        }
+    }
+}
+
+void liberation_n(norme *norme)
+{
+    norme->caracteristiques = 0;
+    free(norme->min);
+    free(norme->max);
+    norme->min = NULL;
+    norme->max = NULL;
+
 }
 
 // int main(void)

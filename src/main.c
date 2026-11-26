@@ -5,14 +5,15 @@ int main(int argc, char *argv[])
 {
     if (argc < 2)
     {
-        fprintf(stderr, "Usage : %s <fichier.csv> [epochs] [learning_rate]\n", argv[0]);
+        fprintf(stderr, "Usage : %s <fichier.csv> [epochs] [learning_rate] [ratio] [normalisation]\n", argv[0]);
         return 1;
     }
 
     char *chemin = argv[1];
-    int epochs = 100;  // valeur par défaut si non précisée
-    float lr = 0.1f;   // valeur par défaut si non précisée
-    float ratio = 0.8; // valeur par défaut si non précisée
+    int epochs = 100;      // valeur par défaut si non précisée
+    float lr = 0.1f;       // valeur par défaut si non précisée
+    float ratio = 0.8;     // valeur par défaut si non précisée
+    int normalisation = 1; // valeur par défaut si non précisée
 
     if (argc >= 3)
         epochs = atoi(argv[2]);
@@ -20,6 +21,8 @@ int main(int argc, char *argv[])
         lr = (float)atof(argv[3]);
     if (argc >= 5)
         ratio = (float)atof(argv[4]);
+    if (argc >= 6)
+        normalisation = atoi(argv[5]);
 
     if (epochs <= 0 || lr <= 0.0f)
     {
@@ -32,6 +35,7 @@ int main(int argc, char *argv[])
     data dataset = {0, 0, NULL};
     data train = {0, 0, NULL};
     data test = {0, 0, NULL};
+    norme norme = {0, NULL, NULL};
 
     loadDataset(&dataset, chemin, 0, -1);
     if (dataset.exemple == NULL || dataset.n <= 0 || dataset.dim <= 1)
@@ -60,6 +64,23 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    if (normalisation == 1)
+    {
+        calcul(&norme, train);
+        if (norme.max == NULL || norme.min == NULL)
+        {
+            liberation_p(perc);
+            liberation_n(&norme);
+            freedataset(dataset);
+            freedataset(train);
+            freedataset(test);
+
+            return 1;
+        }
+        applicationNorme(&train, norme);
+        applicationNorme(&test, norme);
+    }
+
     printf("Dataset : %d exemples (%d train, %d test), %d caracteristiques\n",
            dataset.n, train.n, test.n, dataset.dim - 1);
     printf("Accuracy avant entrainement (train) : %.2f%%\n", accuracy(perc, train) * 100.0f);
@@ -79,6 +100,7 @@ int main(int argc, char *argv[])
     printf("| b=%.4f\n", perc->b);
 
     liberation_p(perc);
+    liberation_n(&norme);
     freedataset(dataset);
     freedataset(train);
     freedataset(test);
